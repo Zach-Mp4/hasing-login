@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block title %}SUPER AWESOME{% endblock %}
+
+{% block content %}
+<h1 class="display-4">{{user['username']}}</h1>
+<ul>
+    {% for key, attr in user.items() %}
+    <li>{{key}}: {{attr}}</li>
+    {% endfor %}
+</ul>
+{% endblock %}

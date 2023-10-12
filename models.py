@@ -40,6 +40,29 @@ class User(db.Model):
         # return instance of user w/username and hashed pwd
         return cls(username=username, password=hashed_utf8, email = email, first_name = first_name, last_name = last_name)
     
+    @classmethod
+    def authenticate(cls, username, pwd):
+        """Validate that user exists & password is correct.
+
+        Return user if valid; else return False.
+        """
+
+        u = User.query.filter_by(username=username).first()
+
+        if u and bcrypt.check_password_hash(u.password, pwd):
+            # return user instance
+            return u
+        else:
+            return False
+    
+    def dictUser(self):
+        return {
+            'username': self.username,
+            'email': self.email,
+            'first_name': self.first_name,
+            'last_name': self.last_name
+        }
+    
 
     
     
