@@ -18,7 +18,17 @@ def start():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegisterForm()
+    if form.validate_on_submit():
+        username = form.username.data
+        password = form.password.data
+        email = form.email.data
+        first_name = form.first_name.data
+        last_name = form.last_name.data
 
+        newUser = User.register(username, password, email, first_name, last_name)
+        db.session.add(newUser)
+        db.session.commit()
+        return redirect('/secret')
     return render_template('register.html', form = form)
 
 @app.route('/login', methods=['GET', 'POST'])
