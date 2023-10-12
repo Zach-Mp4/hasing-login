@@ -106,8 +106,36 @@ def add_feedback(username):
 
 @app.route('/feedback/<id>/update', methods=['GET', 'POST'])
 def edit_feedback(id):
-    form = FeedbackForm()
+    feedback = Feedback.query.get_or_404(id)
+    form = FeedbackForm(obj = feedback)
+    username = feedback.username
+    if form.validate_on_submit():
+        title = form.title.data
+        content = form.content.data
+
+        feedback.title = title
+        feedback.content = content 
+        db.session.add(feedback)
+        db.session.commit()
+        return redirect(f'/users/{username}')
     
+    if session['user_id'] and feedback.username == session['user_id']:
+        return render_template('edit_feedback.html', form = form, id = id)
+    flash('PLEASE LOG IN')
+    return redirect('/login')
+
+@app.route('/feedback/<id>/delete', methods=['POST'])
+def delete_feedback(id):
+    feedback = Feedback.query.get_or_404(id)
+    username = feedback.username
+    if session['user_id'] and feedback.username == session['user_id']:
+        Feedback.query.filter_by(id = id).delete()
+        db.session.commit()
+
+        return redirect(f'/users/{username}')
+    flash('you dont have permission to do that')
+    return redirect('/login')
+
 
 
 

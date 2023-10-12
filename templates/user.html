@@ -20,6 +20,10 @@
 {% for fb in feedback %}
 <h2>{{fb.title}}</h2>
 <b>{{user['username']}}</b>
+<a href="/feedback/{{fb.id}}/update">edit</a>
+<form action="/feedback/{{fb.id}}/delete" method="POST">
+    <button type="submit">DELETE</button>
+</form>
 <p>{{fb.content}}</p>
 <hr>
 {% endfor %}
