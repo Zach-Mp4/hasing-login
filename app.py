@@ -17,41 +17,49 @@ def start():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    form = RegisterForm()
-    if form.validate_on_submit():
-        username = form.username.data
-        password = form.password.data
-        email = form.email.data
-        first_name = form.first_name.data
-        last_name = form.last_name.data
+    try:
+        if session['user_id']:
+            return redirect(f"/users/{session['user_id']}")
+    except:
+        form = RegisterForm()
+        if form.validate_on_submit():
+            username = form.username.data
+            password = form.password.data
+            email = form.email.data
+            first_name = form.first_name.data
+            last_name = form.last_name.data
 
-        newUser = User.register(username, password, email, first_name, last_name)
-        try:
-            db.session.add(newUser)
-            db.session.commit()
-            session["user_id"] = newUser.username
-            return redirect(f'/users/{session["user_id"]}')
-        except:
-            flash('duplicate user try logging in!')
-            return redirect('/register')
+            newUser = User.register(username, password, email, first_name, last_name)
+            try:
+                db.session.add(newUser)
+                db.session.commit()
+                session["user_id"] = newUser.username
+                return redirect(f'/users/{session["user_id"]}')
+            except:
+                flash('duplicate user try logging in!')
+                return redirect('/register')
 
 
-    return render_template('register.html', form = form)
+        return render_template('register.html', form = form)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    form = LoginForm()
-    if form.validate_on_submit():
-        username = form.username.data
-        password = form.password.data
+    try:
+        if session['user_id']:
+            return redirect(f"/users/{session['user_id']}")
+    except:
+        form = LoginForm()
+        if form.validate_on_submit():
+            username = form.username.data
+            password = form.password.data
 
-        curUser = User.authenticate(username, password)
-        if curUser:
-            session["user_id"] = curUser.username
-            return redirect(f'/users/{session["user_id"]}')
-        flash('incorrect username or password')
-        return redirect('/login')
-    return render_template('login.html', form = form)
+            curUser = User.authenticate(username, password)
+            if curUser:
+                session["user_id"] = curUser.username
+                return redirect(f'/users/{session["user_id"]}')
+            flash('incorrect username or password')
+            return redirect('/login')
+        return render_template('login.html', form = form)
 
 @app.route('/users/<username>')
 def user_route(username):
@@ -96,6 +104,10 @@ def add_feedback(username):
     flash('PLEASE LOG IN')
     return redirect('/login')
 
+@app.route('/feedback/<id>/update', methods=['GET', 'POST'])
+def edit_feedback(id):
+    form = FeedbackForm()
+    
 
 
 
