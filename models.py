@@ -17,16 +17,16 @@ class User(db.Model):
     """users model 😁"""
     __tablename__ = 'users'
 
-    username = db.Column(db.Text,
+    username = db.Column(db.String(20),
                          primary_key=True)
     password = db.Column(db.Text,
                          nullable = False)
-    email = db.Column(db.Text,
+    email = db.Column(db.String(50),
                       nullable = False,
                       unique = True)
-    first_name = db.Column(db.Text,
+    first_name = db.Column(db.String(30),
                            nullable = False)
-    last_name = db.Column(db.Text,
+    last_name = db.Column(db.String(30),
                            nullable = False)
     
     @classmethod
@@ -63,6 +63,20 @@ class User(db.Model):
             'last_name': self.last_name
         }
     
+class Feedback(db.Model):
+    __tablename__ = 'feedback'
+
+    id = db.Column(db.Integer,
+                   primary_key=True)
+    title = db.Column(db.String(length=100),
+                      nullable=False)
+    content = db.Column(db.Text,
+                        nullable=False)
+    username = db.Column(db.Text,
+                         db.ForeignKey('users.username', ondelete='CASCADE'),
+                         nullable=False)
+
+    user = db.relationship('User', foreign_keys=[username])
 
     
     

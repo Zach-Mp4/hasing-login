@@ -1,6 +1,6 @@
 from flask import Flask, render_template, redirect, session, flash
-from models import connect_db, db, User
-from forms import RegisterForm, LoginForm
+from models import connect_db, db, User, Feedback
+from forms import RegisterForm, LoginForm, FeedbackForm
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql:///hashing_login"
@@ -58,9 +58,9 @@ def user_route(username):
     try:
         if session["user_id"]:
             curUser = User.query.get_or_404(username)
-
+            feedback = Feedback.query.filter(Feedback.username == username).all()
             userDict = curUser.dictUser()
-            return render_template('user.html', user = userDict)
+            return render_template('user.html', user = userDict, feedback = feedback)
     except:
         return redirect('/register')
 
@@ -69,3 +69,34 @@ def logout():
     session.pop("user_id")
 
     return redirect("/")
+
+@app.route('/users/<username>/delete', methods=['POST'])
+def delete_user(username):
+    if session['user_id'] == username:
+        User.query.filter_by(username = username).delete()
+        db.session.commit()
+        session.pop("user_id")
+        return redirect("/")
+    return redirect(f'/users/{username}')
+
+@app.route('/users/<username>/feedback/add', methods=['GET', 'POST'])
+def add_feedback(username):
+    form = FeedbackForm()
+    if form.validate_on_submit():
+        title = form.title.data
+        content = form.content.data
+        feedback = Feedback(title = title, content = content, username = username)
+        print(feedback)
+        db.session.add(feedback)
+        db.session.commit()
+        return redirect(f'/users/{username}')
+    
+    if session['user_id'] == username:
+        return render_template('add_feedback.html', form = form)
+    flash('PLEASE LOG IN')
+    return redirect('/login')
+
+
+
+
+

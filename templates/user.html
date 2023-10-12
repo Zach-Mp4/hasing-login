@@ -9,4 +9,18 @@
     <li>{{key}}: {{attr}}</li>
     {% endfor %}
 </ul>
+{% if session['user_id'] == user['username'] %}
+<a href="/users/{{user['username']}}/feedback/add"><button>New Feedback</button></a>
+<form action="/users/{{user['username']}}/delete", method="POST">
+<button type="submit">DELETE USER</button>
+</form>
+{% endif %}
+
+<hr>
+{% for fb in feedback %}
+<h2>{{fb.title}}</h2>
+<b>{{user['username']}}</b>
+<p>{{fb.content}}</p>
+<hr>
+{% endfor %}
 {% endblock %}
